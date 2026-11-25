@@ -19,7 +19,6 @@
 │   └── README.md
 └── Day-3/
     ├── task.py
-    ├── tests.csv
     └── README.md
 ```
 
@@ -48,6 +47,6 @@
 - Detailed code and documentation: [`Day-2/`](./Day-2/)
 
 ### Day-3: Your First Agent: What an Agent Is, and LangChain
-- **Focus:** Distinguishing chatbots from agents, the four parts of an agent (brain, instructions, tools, memory), the ReAct agent loop, three levels of AI, architecture decision framework (plain code vs one LLM call vs agent), rebuilding with LangChain LCEL, and automated evaluation using `tests.csv` with 100% pass rate.
+- **Focus:** Distinguishing chatbots from agents, the four parts of an agent (brain, instructions, tools, memory), the ReAct agent loop, three levels of AI, architecture decision framework (plain code vs one LLM call vs agent), rebuilding with LangChain LCEL, temperature tuning (0.3 vs 0.5 vs 0.7), and automated evaluation with 100% pass rate.
 - **Model:** Google Gemini (`gemini-3.5-flash`) via LangChain (`langchain-google-genai`).
 - Detailed code and documentation: [`Day-3/`](./Day-3/)
