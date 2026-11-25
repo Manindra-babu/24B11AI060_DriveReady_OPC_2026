@@ -54,6 +54,50 @@ While Day 1 covered the raw API fundamentals and Day 2 established prompt engine
 
 ---
 
+## 📋 System Prompt Architecture: Role, Facts, Rules, and Format
+
+To eliminate hallucination and ensure deterministic behavior for Sweet Crumbs Bakery, our system prompt follows the structured **Role-Facts-Rules-Format (RFRF)** framework:
+
+```text
+ROLE: You are the friendly, polite assistant for Sweet Crumbs Home Bakery.
+
+FACTS:
+- Plum cake: Rs 500
+- Chocolate cake: Rs 650
+- Cupcake: Rs 80 each (e.g. 6 cupcakes = Rs 480)
+- Notice requirement: All orders strictly need at least 24 hours' notice. We cannot do same-day orders.
+- Dietary options: Every cake and cupcake has a 100% eggless version available upon request.
+
+RULES:
+- Never promise immediate or same-day delivery; always state that orders require 24 hours' notice.
+- If a customer asks about delivery to specific cities/locations (like Kakinada or outside our standard area), or anything not in FACTS, explicitly state: "I'll check with the owner."
+- For multi-item or quantity calculations, work out the total price accurately.
+
+FORMAT: Under 50 words, friendly, polite English.
+```
+
+### Detailed Breakdown of Components:
+
+1. **ROLE (Identity & Persona):**
+   - Sets the identity: Customer service representative for *Sweet Crumbs Home Bakery*.
+   - Establishes a warm, hospitable, and professional tone suited for an artisan home business.
+
+2. **FACTS (Verified Ground-Truth Knowledge):**
+   - **Catalog & Pricing:** Plum cake is strictly Rs 500, Chocolate cake is Rs 650, and individual cupcakes are Rs 80.
+   - **Operational Constraints:** All orders require a minimum of 24 hours' advance notice; same-day drop-offs cannot be accepted.
+   - **Dietary Flexibility:** 100% eggless versions are available across the entire product menu upon request.
+
+3. **RULES (Guardrails & Behavioral Constraints):**
+   - **No Rush Order Commitments:** Explicitly prohibits promising same-day or 2-hour delivery, protecting the bakery from unfulfillable rush commitments.
+   - **Safe Out-of-Bounds Handling:** If asked about specific unverified delivery areas (such as Kakinada, Rajahmundry, etc.) or policies outside of `FACTS`, the bot is strictly required to state: *"I'll check with the owner."* This prevents costly delivery hallucinations.
+   - **Arithmetic Precision:** Mandates multiplying base unit prices accurately for multi-item requests (e.g., $6 \times 80 = \text{Rs } 480$).
+
+4. **FORMAT (Response Boundaries):**
+   - Caps responses to under 50 words to avoid long-winded answers.
+   - Enforces polite, clear English that answers the customer's question directly.
+
+---
+
 ## 🌡️ Temperature Sensitivity Analysis & Optimal Selection
 
 We benchmarked three temperature settings on the customer query:  
@@ -61,9 +105,9 @@ We benchmarked three temperature settings on the customer query:
 
 | Temperature | Model Behavior | Output Excerpt | Suitability |
 | :---: | :--- | :--- | :---: |
-| **0.3** | **Deterministic, accurate math, strict rule adherence** | *"All our treats strictly require at least 24 hours' notice. Two plum cakes cost Rs 1,000."* | **✅ Optimal (Selected)** |
-| **0.5** | Balanced, conversational, polite | *"I am sorry, but we cannot fulfill same-day orders as all our bakes strictly require 24 hours' notice. Two plum cakes cost Rs 1000."* | ⚠️ Acceptable, slight phrasing variation |
-| **0.7** | More creative, higher variance | *"All our orders strictly require at least 24 hours' notice, so we cannot deliver today. For a future date, two plum cakes would cost Rs 1,000."* | ❌ Less predictable for policy adherence |
+| **0.3** | **Deterministic, accurate math, strict rule adherence** | *"All our treats strictly require at least 24 hours' notice. Two plum cakes cost Rs 1,000. Please let us know if you'd like to place an order for tomorrow instead!"* | **✅ Optimal (Selected)** |
+| **0.5** | Balanced, conversational, polite | *"I am sorry, but we cannot fulfill same-day orders as all our bakes strictly require at least 24 hours' notice. Two plum cakes cost Rs 1000..."* | ⚠️ Acceptable, slight phrasing variation |
+| **0.7** | More creative, higher variance | *"All our orders strictly require at least 24 hours' notice, so we cannot deliver today. For a future date, two plum cakes would cost Rs 1,000..."* | ❌ Less predictable for policy adherence |
 
 > **Conclusion:** **`temperature = 0.3`** is selected as the optimal production setting for Sweet Crumbs Bakery. It guarantees zero arithmetic hallucinations, reliable price quotes, and strict enforcement of the 24-hour advance notice policy while maintaining a warm and helpful tone.
 
@@ -93,9 +137,7 @@ The test suite is integrated directly inside `task.py` to maintain a self-contai
 ## 💡 Student 30% "Do It Yourself" Implementation
 
 1. **System Prompt Customization:**  
-   Formulated a custom prompt strictly enforcing Sweet Crumbs' policies:
-   - **Facts:** Plum cake (Rs 500), Chocolate cake (Rs 650), Cupcake (Rs 80 each), 100% eggless options.
-   - **Rules:** Mandatory 24 hours' advance notice; location delivery queries require checking with the owner.
+   Formulated the structured Role, Facts, Rules, and Format prompt strictly customized for Sweet Crumbs Bakery.
 2. **Integrated Test Suite:**  
    Built self-contained regression tests evaluating keyword presence, achieving 100% pass rate.
 3. **Temperature Experimentation:**  
