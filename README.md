@@ -2,7 +2,7 @@
 
 **Student Name:** Manindra Babu  
 **Roll Number:** 24B11AI060  
-**Program:** DriveReady OPC 2026 · AI Agents Workshop (Level 1 Fundamentals)  
+**Program:** DriveReady OPC 2026 · AI Agents Workshop (Level 2: Single Agent)  
 
 ---
 
@@ -19,6 +19,7 @@
 │   └── README.md
 └── Day-3/
     ├── task.py
+    ├── tests.csv
     └── README.md
 ```
 
@@ -30,7 +31,7 @@
 |:---:|:---|:---:|
 | **Day-1** | How LLMs Work & First API Call (Sweet Crumbs Artisan Bakery) | ✅ Completed |
 | **Day-2** | Prompts, Memory, and the Python Agents Need | ✅ Completed |
-| **Day-3** | Autonomous AI Agents & Workflow Automation | ⏳ Upcoming |
+| **Day-3** | Your First Agent: What an Agent Is, and LangChain | ✅ Completed |
 
 ---
 
@@ -45,3 +46,8 @@
 ### Day-2: Prompts, Memory, and the Python Agents Need
 - **Focus:** Conversational memory management with sliding-window history trimming, few-shot intent classification, structured JSON order extraction, and core Python for agents (`@log_call` decorators, functions with type hints and docstrings, resilient `try / except` handling).
 - Detailed code and documentation: [`Day-2/`](./Day-2/)
+
+### Day-3: Your First Agent: What an Agent Is, and LangChain
+- **Focus:** Distinguishing chatbots from agents, the four parts of an agent (brain, instructions, tools, memory), the ReAct agent loop, three levels of AI, architecture decision framework (plain code vs one LLM call vs agent), rebuilding with LangChain LCEL, and automated evaluation using `tests.csv` with 100% pass rate.
+- **Model:** Google Gemini (`gemini-3.5-flash`) via LangChain (`langchain-google-genai`).
+- Detailed code and documentation: [`Day-3/`](./Day-3/)
