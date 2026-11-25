@@ -29,13 +29,19 @@
 | Day | Topic | Status |
 |:---:|:---|:---:|
 | **Day-1** | How LLMs Work & First API Call (Sweet Crumbs Artisan Bakery) | ✅ Completed |
-| **Day-2** | Multi-Turn Memory, System Prompts & Tool Calling | ⏳ Upcoming |
+| **Day-2** | Prompts, Memory, and the Python Agents Need | ✅ Completed |
 | **Day-3** | Autonomous AI Agents & Workflow Automation | ⏳ Upcoming |
 
 ---
 
-## 🧁 Day-1 Overview: Sweet Crumbs Artisan Bakery & Cafe
+## 🧁 Module Summaries
+
+### Day-1: How LLMs Work & First API Call
 - **Focus:** Core LLM fundamentals (next-token prediction loop, tokens, temperature dial, context window, statelessness) and preventing hallucination using tailored **Facts and Rules**.
 - **Model:** `openai/gpt-oss-120b` via Groq API (`langchain_groq`).
 - **Prompt Safety:** Evaluated prompt injection vulnerabilities using `meta-llama/llama-prompt-guard-2-22m`.
-- For full implementation, test cases, and outputs, visit the [`Day-1/`](./Day-1/) folder.
+- Detailed code and documentation: [`Day-1/`](./Day-1/)
+
+### Day-2: Prompts, Memory, and the Python Agents Need
+- **Focus:** Conversational memory management with sliding-window history trimming, few-shot intent classification, structured JSON order extraction, and core Python for agents (`@log_call` decorators, functions with type hints and docstrings, resilient `try / except` handling).
+- Detailed code and documentation: [`Day-2/`](./Day-2/)
