@@ -12,12 +12,14 @@
 24B11AI060_DriveReady_OPC_2026/
 ├── Day-1/
 │   ├── task.py
-│   ├── README.md
-│   └── agenticAI_Day1.ipynb
+│   └── README.md
 ├── Day-2/
 │   ├── task.py
 │   └── README.md
-└── Day-3/
+├── Day-3/
+│   ├── task.py
+│   └── README.md
+└── Day-4/
     ├── task.py
     └── README.md
 ```
@@ -31,6 +33,7 @@
 | **Day-1** | How LLMs Work & First API Call (Sweet Crumbs Artisan Bakery) | ✅ Completed |
 | **Day-2** | Prompts, Memory, and the Python Agents Need | ✅ Completed |
 | **Day-3** | Your First Agent: What an Agent Is, and LangChain | ✅ Completed |
+| **Day-4** | Tools, Structured Output, and Google Sheets | ✅ Completed |
 
 ---
 
@@ -50,3 +53,8 @@
 - **Focus:** Distinguishing chatbots from agents, the four parts of an agent (brain, instructions, tools, memory), the ReAct agent loop, three levels of AI, architecture decision framework (plain code vs one LLM call vs agent), rebuilding with LangChain LCEL, temperature tuning (0.3 vs 0.5 vs 0.7), and automated evaluation with 100% pass rate.
 - **Model:** Google Gemini (`gemini-3.5-flash`) via LangChain (`langchain-google-genai`).
 - Detailed code and documentation: [`Day-3/`](./Day-3/)
+
+### Day-4: Tools, Structured Output, and Google Sheets
+- **Focus:** Equipping agents with external tools using LangChain's `@tool` decorator (`get_price`, `is_open`, `log_order`), function calling execution loop, Pydantic runtime data validation (`BaseModel`, `Literal`, `ge=1`), Google Sheets order persistence via `gspread` (with offline fallback resilience), and execution trace auditing.
+- **Model:** Groq (`openai/gpt-oss-20b`) / Gemini (`gemini-3.5-flash`) via LangChain (`langchain.agents.create_agent`).
+- Detailed code and documentation: [`Day-4/`](./Day-4/)
