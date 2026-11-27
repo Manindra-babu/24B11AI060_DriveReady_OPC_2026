@@ -2,15 +2,16 @@
 Day 5 Task: Memory and RAG - An Agent That Remembers and Looks Things Up
 AI Agents Workshop (Level 2: Single Agent) - DriveReady OPC 2026
 Student: Manindra Babu (Roll No: 24B11AI060)
-Case Study: The Clockmaker of Silverfall (Custom Knowledge Story) & Sweet Crumbs Bakery (Agent System)
+Knowledge Document: The Clockmaker of Silverfall (The_Clockmaker_of_Silverfall.pdf)
+Production Agent Case Study: Sweet Crumbs Bakery & Cafe
 
 Curriculum Covered:
 1. Three Kinds of Memory:
    - Conversation Memory (short-term, isolated per thread)
    - Customer Memory (long-term across sessions)
    - Knowledge Base Memory (external documents via RAG)
-2. Custom Story Document Creation ("The Clockmaker of Silverfall"):
-   - Rich multi-character, factual narrative replacing "The Little Lantern"
+2. PDF Ingestion & Text Extraction via PyMuPDF (fitz):
+   - Loading and reading 'The_Clockmaker_of_Silverfall.pdf' directly
 3. Text Chunking & Overlap:
    - Preserving semantic boundaries without cutting critical facts
 4. Vector Embeddings:
@@ -40,6 +41,7 @@ load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
 
+import fitz  # PyMuPDF for PDF text extraction
 from sentence_transformers import SentenceTransformer
 import chromadb
 from pydantic import BaseModel, Field
@@ -66,11 +68,10 @@ else:
 
 
 # =====================================================================
-# 1. Custom Knowledge Document: "The Clockmaker of Silverfall"
-# (Replaces "The Little Lantern" with a rich, testable narrative)
+# 1. PDF Text Ingestion & Knowledge Document
 # =====================================================================
 
-CUSTOM_STORY = """
+FALLBACK_STORY = """
 The Clockmaker of Silverfall
 
 In the mist-shrouded valley of Silverfall, nestled beneath the towering granite cliffs of Azure Ridge, lived an elderly master horologist named Silas and his perceptive young apprentice, Kieran. While the valley villagers relied on erratic sundials and the heavy tolling of the central Cathedral bell, Silas dedicated forty years of his life to constructing the Celestial Chronometer. This magnificent brass timepiece was engineered with thirty-six synthetic sapphire bearings, four counter-weighted silver escapements, and a central pendulum sculpted from starlight obsidian discovered in the old iron mines.
@@ -83,6 +84,21 @@ Alerted by the distant, muffled echoes of a distress horn echoing through the go
 
 Silas and Kieran provided the shivering travelers with thick wool quilts, dried venison broth, and hot cups of spiced chamomile tea until the blizzard abated three days later. When Mayor Sterling and the valley council presented Silas with a purse of two hundred gold ducats as a reward, the old clockmaker gently returned the coin. He stated: 'True precision is never measured by how we count our hours, but by how each hour serves someone who has lost their way in the storm.' Following that harrowing winter, the valley established the Silverfall Watch guild, installing the Celestial Chronometer in the new town hall, where Kieran and each succeeding generation of apprentices wound the Solstice Key with reverence every winter solstice.
 """
+
+def read_pdf(pdf_path: str) -> str:
+    """Extract text from a PDF document using PyMuPDF (fitz)."""
+    if not os.path.exists(pdf_path):
+        return FALLBACK_STORY
+    
+    pages_text = []
+    with fitz.open(pdf_path) as doc:
+        for page in doc:
+            text = page.get_text("text").strip()
+            if text:
+                pages_text.append(text)
+    
+    extracted = "\n\n".join(pages_text)
+    return extracted if extracted.strip() else FALLBACK_STORY
 
 
 # =====================================================================
@@ -355,11 +371,18 @@ def run_tests():
     print("DAY 5: RETRIEVAL-AUGMENTED GENERATION (RAG) & MEMORY TEST SUITE")
     print("=" * 70)
 
-    # 1. Initialize RAG Engine on Custom Story
-    rag = RAGEngine(model_name="all-MiniLM-L6-v2")
-    rag.index_document(CUSTOM_STORY, chunk_size=380, overlap=80)
+    # 1. Initialize RAG Engine on PDF Document
+    pdf_file = os.path.join(os.path.dirname(__file__), "The_Clockmaker_of_Silverfall.pdf")
+    if not os.path.exists(pdf_file):
+        pdf_file = "The_Clockmaker_of_Silverfall.pdf"
+    
+    story_content = read_pdf(pdf_file)
+    print(f"[PDF Ingestion] Loaded '{os.path.basename(pdf_file)}' ({len(story_content)} characters).")
 
-    # Test cases on custom story
+    rag = RAGEngine(model_name="all-MiniLM-L6-v2")
+    rag.index_document(story_content, chunk_size=380, overlap=80)
+
+    # Test cases on knowledge document
     story_tests = [
         {
             "id": "STORY-01",
@@ -399,7 +422,7 @@ def run_tests():
         }
     ]
 
-    print("\n--- PART A: Custom Knowledge Document RAG Tests ---")
+    print("\n--- PART A: Knowledge Document (PDF) RAG Tests ---")
     passed = 0
     total = len(story_tests)
 

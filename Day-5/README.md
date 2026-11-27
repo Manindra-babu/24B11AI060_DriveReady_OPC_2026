@@ -4,7 +4,7 @@
 **Session:** Day 5 (Session 3 of 3)  
 **Student:** Manindra Babu  
 **Roll Number:** `24B11AI060`  
-**Knowledge Story Case Study:** *The Clockmaker of Silverfall* (Custom Original Story replacing "The Little Lantern")  
+**Knowledge Document:** [`The_Clockmaker_of_Silverfall.pdf`](./The_Clockmaker_of_Silverfall.pdf)  
 **Production Agent Case Study:** *Sweet Crumbs Home Bakery & Cafe*  
 **Model Provider:** Groq (`openai/gpt-oss-120b`) / Google Gemini (`gemini-3.5-flash`) via LangChain  
 **Embedding Model:** `sentence-transformers/all-MiniLM-L6-v2` (384 dimensions)  
@@ -17,7 +17,7 @@
 While Day 4 equipped our assistant with external Python tools (`get_price`, `is_open`, `log_order`), **Day 5** completes the single agent architecture by solving two fundamental challenges:
 1. **Conversation Memory (Short-Term):** Isolating multi-turn dialogues across different concurrent users using a checkpointer (`InMemorySaver`) and distinct `thread_id` identifiers.
 2. **Knowledge Retrieval (RAG):** Searching extensive external documents and business policies dynamically on demand using semantic vector search instead of cramming hundreds of rules into the static prompt.
-3. **Custom Testing Knowledge Story:** In accordance with the project requirements, we replaced the short "The Little Lantern" PDF with a rich, testable original narrative titled **"The Clockmaker of Silverfall"**, featuring specific character names, dates, artifacts, locations, mechanical details, and quotes to rigorously validate factual retrieval, semantic inference, and zero-hallucination guardrails.
+3. **PDF Ingestion & Document Grounding:** Loading and parsing the knowledge document [`The_Clockmaker_of_Silverfall.pdf`](./The_Clockmaker_of_Silverfall.pdf) via PyMuPDF (`fitz`), chunking with sliding overlap, and validating factual extraction with strict anti-hallucination guardrails.
 4. **Single-Agent Final Sign-Off:** Bringing together all 5 components of a Level 2 Agent:
    - **Brain:** LLM (`openai/gpt-oss-120b`)
    - **Instructions:** System Prompt following Role-Facts-Rules-Format (RFRF)
@@ -53,24 +53,30 @@ While Day 4 equipped our assistant with external Python tools (`get_price`, `is_
 
 ---
 
-## 📖 The Custom Knowledge Story: "The Clockmaker of Silverfall"
+## 📄 Knowledge Document: The Clockmaker of Silverfall (PDF)
 
-Instead of using "The Little Lantern", we authored a multi-dimensional narrative with specific, verifiable facts:
+The knowledge base for testing RAG extraction is provided in a dedicated PDF document:  
+📄 **[The_Clockmaker_of_Silverfall.pdf](./The_Clockmaker_of_Silverfall.pdf)**
 
-> **Narrative Synopsis:**  
-> In the mist-shrouded valley of Silverfall beneath the Azure Ridge, Master Silas spent forty years constructing the **Celestial Chronometer**—a brass timepiece featuring 36 synthetic sapphire bearings, four counter-weighted silver escapements, and a pendulum sculpted from starlight obsidian. The timepiece required winding every winter solstice using the **Solstice Key**, a golden meteorite brass key kept in a cedar lockbox in the attic.
+The system extracts text dynamically using PyMuPDF (`fitz`), splits into semantic segments, and evaluates query responses against verifiable facts:
+
+> **Document Summary:**  
+> In the valley of Silverfall beneath Azure Ridge, Master Silas dedicated forty years to constructing the **Celestial Chronometer**—a brass timepiece engineered with 36 synthetic sapphire bearings, four counter-weighted silver escapements, and a pendulum sculpted from starlight obsidian. The timepiece required winding every winter solstice with the **Solstice Key**, a golden meteorite brass key kept in a cedar lockbox in the attic.
 > 
-> During the **Great Frost of November 1782**, freezing winds cracked the Cathedral bell gears, disabling the valley's only timekeeping and relief coordination. North at Raven's Pass, an eight-wagon caravan led by Captain Orin broke an axle on jagged rocks. Silas used the Chronometer's astrolabe dial to compute the lunar azimuth and activated the clocktower's nocturnal beacon—an oil-furnace spotlight focused through a 60mm quartz prism. The amber light guided 18 freezing travelers to safety. When offered 200 gold ducats, Silas refused reward, stating: *"True precision is never measured by how we count our hours, but by how each hour serves someone who has lost their way in the storm."*
+> During the **Great Frost of November 1782**, freezing winds cracked the Cathedral bell gears, disabling the valley's emergency timekeeping. North at Raven's Pass, an eight-wagon merchant caravan led by Captain Orin broke an axle on jagged rocks. Silas used the Chronometer's astrolabe dial to compute the lunar azimuth and activated the clocktower's nocturnal beacon—an oil-furnace spotlight focused through a 60mm quartz prism. The amber beam guided 18 freezing travelers to safety. When offered 200 gold ducats, Silas refused reward, stating: *"True precision is never measured by how we count our hours, but by how each hour serves someone who has lost their way in the storm."*
 
 ---
 
 ## ⚙️ Technical Implementation: RAG Pipeline
 
-### 1. Semantic Chunking with Sliding Overlap
+### 1. PDF Ingestion & Semantic Chunking
 ```python
+def read_pdf(pdf_path: str) -> str:
+    # Extracts clean text streams across all pages using PyMuPDF (fitz)
+
 def split_text(text: str, chunk_size: int = 400, overlap: int = 80) -> List[str]:
-    # Splits document into 400-char segments with 80-char overlap
-    # Prevents cutting sentences or key numerical entities in half
+    # Splits text into 400-char chunks with 80-char sliding overlap
+    # Preserves entity boundaries across consecutive segments
 ```
 
 ### 2. Embeddings via SentenceTransformers
@@ -78,7 +84,7 @@ Text strings are projected into a 384-dimensional dense vector space using `all-
 $$\text{Cosine Similarity}(\mathbf{q}, \mathbf{d}) = \mathbf{q}_{\text{norm}} \cdot \mathbf{d}_{\text{norm}}$$
 
 ### 3. Vector Database Indexing (FAISS & ChromaDB)
-- **Custom Story:** Indexed into an exact normalized inner-product vector index (`VectorIndex`) implementing FAISS-compatible $O(1)$ batch vector search.
+- **PDF Knowledge Document:** Indexed into an exact normalized inner-product vector index (`VectorIndex`) implementing FAISS-compatible $O(1)$ batch vector search.
 - **Bakery Policies:** Indexed into **ChromaDB** (`sweet_crumbs_faq`) with 12 distinct operational policies (delivery tiers, advance payment, cancellations, allergen advisories, and photo cake notice).
 
 ### 4. Grounded Prompt with Anti-Hallucination Guardrail
@@ -127,13 +133,15 @@ All tests are integrated into `Day-5/task.py` and execute automatically:
 
 ## 💡 Student 30% Implementation Highlights
 
-1. **Custom Narrative Authoring:**  
-   Replaced "The Little Lantern" with "The Clockmaker of Silverfall", providing precise semantic anchors for testing.
-2. **Normalized Vector Index Architecture:**  
+1. **Standalone PDF Document Creation:**  
+   Created and formatted [`The_Clockmaker_of_Silverfall.pdf`](./The_Clockmaker_of_Silverfall.pdf) as a dedicated PDF knowledge source.
+2. **PyMuPDF Document Ingestion:**  
+   Implemented `read_pdf` using `fitz` for robust PDF text extraction, feeding directly into chunking and embedding pipelines.
+3. **Normalized Vector Index Architecture:**  
    Implemented an in-memory normalized vector index calculating cosine similarity through matrix dot products, ensuring zero-dependency compatibility with FAISS.
-3. **Zero-Hallucination Prompt Engineering:**  
+4. **Zero-Hallucination Prompt Engineering:**  
    Engineered strict out-of-context guardrails so questions outside the knowledge base reliably return `"The answer is not available in the context."` without fabricating facts.
-4. **Thread-Level Conversation Isolation:**  
+5. **Thread-Level Conversation Isolation:**  
    Demonstrated multi-turn conversational persistence with LangGraph checkpointers, verifying concurrent user separation across independent sessions.
-5. **RAG-Powered Policy Agent:**  
+6. **RAG-Powered Policy Agent:**  
    Integrated ChromaDB collection querying inside the `@tool def search_faq` function, allowing the Sweet Crumbs agent to dynamically answer policy questions.
